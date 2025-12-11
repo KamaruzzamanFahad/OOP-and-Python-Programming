@@ -71,15 +71,18 @@ def admin_menu():
             age = int(input("Enter employee age: "))
             designation = input("Enter employee designation: ")
             salary = float(input("Enter employee salary: "))
-            employee = admin.add_employee(name=name, email=email, phone=phone, address=address, age=age, designation=designation, salary=salary)
+            employee = Employee(name=name, email=email, phone=phone, address=address, age=age, designation=designation, salary=salary)
+            admin.add_employee(mamar_resturant, employee)
         
         elif choice == 3:
             admin.view_employees(mamar_resturant)
         elif choice == 4:
-            admin.add_menu_item(mamar_resturant)
+            admin.view_menu(mamar_resturant)
         elif choice == 5:
             item_name = input("Enter item name to delete: ")
             admin.remove_menu_item(mamar_resturant, item_name)
+        elif choice == 6:
+            break
         else:
             print("Invalid choice. Please try again.")
 

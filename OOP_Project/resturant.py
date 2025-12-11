@@ -13,3 +13,5 @@ class Resturant:
         print("Employee List:")
         for em in self.employees:
             print(em.name, em.email, em.phone, em.address, em.age, em.designation, em.salary)
+    def show_menu_item(self):
+        self.menu.show_menu_item()
