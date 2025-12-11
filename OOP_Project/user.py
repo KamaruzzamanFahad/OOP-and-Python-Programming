@@ -1,7 +1,7 @@
 from abc import ABC
 from tkinter import NO
 from typing import Self
-from order import Order
+from orders import Order
 
 class User(ABC):
     def __init__(self, name, email, phone, address):
@@ -37,6 +37,11 @@ class Customer(User):
         for item, quantity in self.cart.items.items():
             print(f"{item.name}\t{item.price}\t{quantity}")
             print(f"Total Price: {self.cart.total_price}")
+    
+    def Paybill(self):
+        print(f"Total amount to be paid: {self.cart.total_price}")
+        self.cart.clear_cart()
+        print("Payment successful. Cart is now empty.")
 
 class Employee(User):
     def __init__(self, name, email, phone, address, age, designation, salary):
