@@ -15,7 +15,9 @@ class School:
         self.teachers[subject] = teacher
     
     def student_addmition(self, student):
-        pass
+        classnem = student.classroom.name
+        self.classrooms[classnem].add_student(student)
+
 
     @staticmethod
     def calculate_greade(marks):
@@ -65,4 +67,35 @@ class School:
             return 'F'
 
     def __repr__(self):
-        pass
+        print("All Students")
+
+        result = ""
+        for key, value in self.classrooms.items():
+            result += (f"...{key.upper()} classroom students...\n")
+
+            for student in value.students:
+                result += f"{student.name} \n"
+        print(result)
+
+
+        print("All Subjects")
+        subject = ''
+        for key, value in self.classrooms.items():
+            subject += f"... {key.upper()} classroom subjects \n"
+            for sub in value.subjects:
+                subject += f"{sub.name} \n"
+        print(subject)
+
+        print("Students Results")
+        results = ''
+        for key, value in self.classrooms.items():
+            results += f"... {key.upper()} classroom results ... \n"
+            for student in value.students:
+                results += f"Student Name: {student.name} \n"
+                for sub, grade in student.subject_grade.items():
+                    results += f"Subject: {sub} - Grade: {grade} \n"
+        print(results)
+        return ""
+
+
+
