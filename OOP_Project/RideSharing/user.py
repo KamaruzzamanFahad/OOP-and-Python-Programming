@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from re import L
+from ride import Ride, RideRequest, RideMatching
 
 class User(ABC):
     def __init__(self, name, email, nid):
@@ -30,11 +30,25 @@ class Rider(User):
     def update_location(self, current_location):
         self.current_location = current_location
     
-    def request_ride(self, ridesharing, destination):
-        pass
+    def request_ride(self, ridesharing, destination, vehicle_type):
+        ride_request = RideRequest(self, destination)
+        ride_matching = RideMatching(ridesharing.drivers)
+        ride = ride_matching.find_driver(ride_request, vehicle_type)
+        ride.rider = self
+        self.current_ride = ride
+        print("Ride requested successfully.")
 
-    def current_ride(self):
-        print(self.current_ride)
+    def show_current_ride(self):
+        print("Current Ride Details:")
+        print("Rider:", self.name)
+        print("From:", self.current_ride.start_location)
+        print("To:", self.current_ride.end_location)
+        print("Vehicle Type:", self.current_ride.vehicle.vehicle_type)
+        print("Estimated Fare:", self.current_ride.estimated_fare)
+        print("Driver:", self.current_ride.driver.name if self.current_ride.driver else "No driver assigned")
+
+    
+    
 
 class Driver(User):
     def __init__(self, name, email, nid, current_location) -> None:
@@ -44,6 +58,10 @@ class Driver(User):
     
     def display_profile(self):
         print(f"Driver Name: {self.name} and Email: {self.email}")
+
+    def accept_ride(self, ride):
+        ride.start_ride()
+        ride.set_driver(self)
     
-    def accept_ride(slef, ride):
-        pass
+    def rech_destination(self, ride):
+        ride.end_ride()
