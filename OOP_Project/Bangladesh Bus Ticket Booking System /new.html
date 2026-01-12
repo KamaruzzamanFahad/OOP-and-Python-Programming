@@ -1,0 +1,1734 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocabulary Learning App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .controls {
+            padding: 15px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .alphabet-filter {
+            padding: 15px;
+            background: white;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .letter-btn {
+            width: 35px;
+            height: 35px;
+            border: 2px solid #dee2e6;
+            background: white;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .letter-btn:hover, .letter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .stats {
+            padding: 10px 15px;
+            background: #fff3cd;
+            color: #856404;
+            font-weight: 600;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .vocab-list {
+            padding: 15px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .vocab-item {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+        }
+
+        .vocab-item:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .vocab-header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        #index {
+            margin-right: auto;
+            font-size: 0.9rem;
+            color: #6c757d;
+            background-color: #6c757d1a;
+            border: #28a7451a 1px solid;
+            border-radius: 30%;
+            padding: 4px 8px;
+        }
+
+        .word-bangla {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 8px;
+        }
+
+        .word-english {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .speaker-icon {
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: transform 0.2s;
+        }
+
+        .speaker-icon:hover {
+            transform: scale(1.2);
+        }
+
+        .blur-toggle {
+            padding: 5px 10px;
+            background: #ffc107;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .vocab-item .bangla-blur {
+            filter: blur(5px);
+            user-select: none;
+        }
+
+        .vocab-item .english-blur {
+            filter: blur(5px);
+            user-select: none;
+        }
+
+        .sentence {
+            font-size: 0.95rem;
+            color: #6c757d;
+            font-style: italic;
+            padding: 8px;
+            background: #f8f9fa;
+            border-left: 3px solid #667eea;
+            border-radius: 4px;
+        }
+
+        .mark-btn {
+            padding: 5px 10px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .mark-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            margin-top: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            min-width: 150px;
+        }
+
+        .mark-dropdown.show {
+            display: block;
+        }
+
+        .mark-option {
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .mark-option:last-child {
+            border-bottom: none;
+        }
+
+        .mark-option:hover {
+            background: #f8f9fa;
+        }
+
+        .mark-option.level-5 { color: #dc3545; font-weight: bold; }
+        .mark-option.level-4 { color: #fd7e14; font-weight: bold; }
+        .mark-option.level-3 { color: #ffc107; font-weight: bold; }
+        .mark-option.level-2 { color: #20c997; }
+        .mark-option.level-1 { color: #6c757d; }
+
+        .vocab-item.marked-5 { border-color: #dc3545; background: #ffe6e6; border-width: 3px; }
+        .vocab-item.marked-4 { border-color: #fd7e14; background: #fff3e6; border-width: 3px; }
+        .vocab-item.marked-3 { border-color: #ffc107; background: #fffbe6; border-width: 2px; }
+        .vocab-item.marked-2 { border-color: #20c997; background: #e6fff8; border-width: 2px; }
+        .vocab-item.marked-1 { border-color: #6c757d; background: #f0f0f0; }
+
+        .mark-btn.marked-5 { background: #dc3545; }
+        .mark-btn.marked-4 { background: #fd7e14; }
+        .mark-btn.marked-3 { background: #ffc107; color: #000; }
+        .mark-btn.marked-2 { background: #20c997; }
+        .mark-btn.marked-1 { background: #6c757d; }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            .word-english {
+                font-size: 1.1rem;
+            }
+            .vocab-item {
+                padding: 12px;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Vocabulary Learning App</h1>
+            <p>বাংলা থেকে ইংরেজি শব্দভাণ্ডার শিখুন</p>
+        </div>
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="শব্দ খুঁজুন...">
+            </div>
+            <button class="btn btn-primary" onclick="toggleAllBlur('bangla')">সব বাংলা Blur</button>
+            <button class="btn btn-primary" onclick="toggleAllBlur('english')">সব English Blur</button>
+            <button class="btn btn-primary" onclick="showMarkedWords()">Marked Words</button>
+            <button class="btn btn-primary" onclick="resetFilters()">Reset</button>
+        </div>
+
+        <div class="alphabet-filter" id="alphabetFilter"></div>
+        <div class="stats" id="stats"></div>
+        <div class="vocab-list" id="vocabList"></div>
+    </div>
+
+    <script>
+        const vocabData = {
+  "a": ["একটি", "She found a beautiful shell on the beach."],
+  "abandon": ["পরিত্যাগ করা", "They had to abandon the sinking ship."],
+  "ability": ["ক্ষমতা", "Her ability to solve complex problems is impressive."],
+  "able": ["সক্ষম", "With practice, you will be able to master this skill."],
+  "abortion": ["গর্ভপাত", "The debate about abortion rights continues in many countries."],
+  "about": ["সম্পর্কে / প্রায়", "Let's talk about your future plans."],
+  "above": ["উপরে", "The helicopter flew above the clouds."],
+  "abroad": ["বিদেশে", "He went abroad for higher education."],
+  "absence": ["অনুপস্থিতি", "Her absence from the meeting was noticed by everyone."],
+  "absolute": ["পরম / সম্পূর্ণ", "She has absolute confidence in her team."],
+  "absolutely": ["একদমই / সম্পূর্ণরূপে", "I absolutely agree with your proposal."],
+  "absorb": ["শোষণ করা", "The sponge can absorb a lot of water."],
+  "abuse": ["অপব্যবহার", "Child abuse is a serious crime that must be reported."],
+  "academic": ["শিক্ষাগত / একাডেমিক", "She has a strong academic background in science."],
+  "accept": ["গ্রহণ করা", "I gladly accept your kind invitation."],
+  "access": ["প্রবেশাধিকার", "The building has wheelchair access for disabled people."],
+  "accident": ["দুর্ঘটনা", "He survived the car accident without serious injuries."],
+  "accompany": ["সঙ্গ দেওয়া", "Would you like me to accompany you to the hospital?"],
+  "accomplish": ["সম্পন্ন করা", "With hard work, you can accomplish your goals."],
+  "according": ["অনুসারে", "According to the weather report, it will rain tomorrow."],
+  "account": ["হিসাব / অ্যাকাউন্ট", "I need to check my bank account balance."],
+  "accurate": ["সঠিক", "The witness gave an accurate description of the suspect."],
+  "accuse": ["অভিযুক্ত করা", "The lawyer accused the witness of lying."],
+  "achieve": ["অর্জন করা", "With determination, you can achieve anything."],
+  "achievement": ["অর্জন", "Winning the championship was her greatest achievement."],
+  "acid": ["অ্যাসিড", "The scientist handled the acid with protective gloves."],
+  "acknowledge": ["স্বীকৃত", "The company acknowledged its mistake and apologized."],
+  "acquire": ["অর্জন করা", "She managed to acquire valuable experience during her internship."],
+  "across": ["অপর পাশে / জুড়ে", "There is a beautiful bridge across the river."],
+  "act": ["কাজ / অভিনয় করা", "It was an act of great bravery."],
+  "action": ["কর্ম / ব্যবস্থা", "The government must take action to reduce pollution."],
+  "active": ["সক্রিয়", "She leads an active lifestyle with regular exercise."],
+  "activist": ["কর্মী", "The environmental activist protested against deforestation."],
+  "activity": ["কার্যক্রম", "The school organizes various extracurricular activities."],
+  "actor": ["অভিনেতা", "The famous actor received a standing ovation."],
+  "actress": ["অভিনেত্রী", "The young actress won an award for her performance."],
+  "actual": ["প্রকৃত", "The actual cost was much higher than the estimate."],
+  "actually": ["আসলে", "I thought he was French, but actually he's Belgian."],
+  "add": ["যোগ করা", "Please add some sugar to my tea."],
+  "addition": ["যোগ", "In addition to English, she speaks three other languages."],
+  "additional": ["অতিরিক্ত", "We need additional information to process your application."],
+  "address": ["ঠিকানা", "Please write your permanent address on the form."],
+  "adequate": ["পর্যাপ্ত", "The hotel provides adequate facilities for guests."],
+  "adjust": ["সামঞ্জস্য করা", "It takes time to adjust to a new environment."],
+  "adjustment": ["সামঞ্জস্য", "The mechanic made a small adjustment to the engine."],
+  "administration": ["প্রশাসন", "The new administration introduced several reforms."],
+  "administrator": ["প্রশাসক", "The school administrator handles all official matters."],
+  "admire": ["প্রশংসা করা", "I really admire your dedication to this project."],
+  "admission": ["ভর্তি / প্রবেশ", "The museum charges a small fee for admission."],
+  "admit": ["স্বীকার করা", "He had to admit that he was wrong."],
+  "adolescent": ["কিশোর/কিশোরী", "Adolescent years can be challenging for many teenagers."],
+  "adopt": ["দত্তক নেওয়া", "They decided to adopt a child from an orphanage."],
+  "adult": ["প্রাপ্তবয়স্ক", "This movie is suitable for adult audiences only."],
+  "advance": ["অগ্রিম / উন্নতি", "She made a significant advance in her research."],
+  "advanced": ["উন্নত", "He is taking an advanced course in mathematics."],
+  "advantage": ["সুবিধা", "Speaking multiple languages is a great advantage in today's world."],
+  "adventure": ["দুঃসাহসিক কাজ", "Our trip to the mountains was a real adventure."],
+  "advertising": ["বিজ্ঞাপন", "The company spends millions on television advertising."],
+  "advice": ["পরামর্শ", "My father gave me valuable advice about life."],
+  "advise": ["পরামর্শ দেওয়া", "I would advise you to save money for the future."],
+  "adviser": ["পরামর্শদাতা", "The student met with her academic adviser to plan her courses."],
+  "advocate": ["উকিল / সমর্থন করা", "She advocates for women's rights in her community."],
+  "affair": ["ব্যাপার / সম্পর্ক", "The government's internal affairs are kept confidential."],
+  "affect": ["প্রভাবিত করা", "The bad weather will affect our travel plans."],
+  "afford": ["সামর্থ্য থাকা", "I cannot afford to buy a new car right now."],
+  "afraid": ["ভীত", "The little girl is afraid of the dark."],
+  "African": ["আফ্রিকান", "African culture is rich and diverse."],
+  "African-American": ["আফ্রিকান-আমেরিকান", "African-American history is an important part of American history."],
+  "after": ["পরে", "We will go for a walk after dinner."],
+  "afternoon": ["বিকাল", "I usually take a nap in the afternoon."],
+  "again": ["আবার", "Please say that again, I didn't hear you."],
+  "against": ["বিরুদ্ধে", "The protest was against the new law."],
+  "age": ["বয়স", "At what age did you learn to drive?"],
+  "agency": ["সংস্থা", "She works for a travel agency."],
+  "agenda": ["আলোচ্যসূচি", "The first item on the agenda is the budget report."],
+  "agent": ["প্রতিনিধি", "The insurance agent explained the policy details."],
+  "aggressive": ["আক্রমনাত্মক", "The aggressive dog barked at strangers."],
+  "ago": ["আগে", "I met her two years ago."],
+  "agree": ["সম্মত হওয়া", "I agree with your opinion on this matter."],
+  "agreement": ["চুক্তি", "Both parties signed the agreement yesterday."],
+  "agricultural": ["কৃষি সংক্রান্ত", "The country's economy depends on agricultural products."],
+  "ah": ["আহ", "Ah, now I understand what you mean!"],
+  "ahead": ["এগিয়ে", "Look ahead to see what's coming."],
+  "aid": ["সাহায্য", "The organization provides aid to disaster victims."],
+  "aide": ["সহকারী", "The president's aide handed him the important documents."],
+  "AIDS": ["এইডস", "Education is important in the fight against AIDS."],
+  "aim": ["লক্ষ্য", "His aim is to become a doctor."],
+  "air": ["বায়ু", "The fresh air in the mountains is refreshing."],
+  "aircraft": ["বিমান", "The aircraft landed safely at the airport."],
+  "airline": ["এয়ারলাইন", "Which airline are you flying with?"],
+  "airport": ["বিমানবন্দর", "We arrived at the airport two hours early."],
+  "album": ["অ্যালবাম", "She keeps her childhood photos in a special album."],
+  "alcohol": ["মদ", "Consuming too much alcohol is harmful to health."],
+  "alive": ["জীবিত", "Despite the accident, everyone was alive."],
+  "all": ["সব", "All students must attend the meeting."],
+  "alliance": ["জোট", "The two companies formed a strategic alliance."],
+  "allow": ["অনুমতি দেওয়া", "My parents allow me to go out with friends on weekends."],
+  "ally": ["মিত্র", "The two countries have been strong allies for decades."],
+  "almost": ["প্রায়", "I have almost finished my homework."],
+  "alone": ["একা", "She lives alone in a small apartment."],
+  "along": ["বরাবর", "We walked along the beach at sunset."],
+  "already": ["ইতিমধ্যে", "He has already completed the assignment."],
+  "also": ["এছাড়াও", "She is a talented singer and also a good dancer."],
+  "alter": ["পরিবর্তন করা", "We need to alter our plans due to the bad weather."],
+  "alternative": ["বিকল্প", "Solar energy is a good alternative to fossil fuels."],
+  "although": ["যদিও", "Although it was raining, we went for a walk."],
+  "always": ["সর্বদা", "She always arrives on time."],
+  "AM": ["সকাল", "The meeting is scheduled for 10 AM tomorrow."],
+  "amazing": ["আশ্চর্যজনক", "The view from the top of the mountain was amazing."],
+  "American": ["আমেরিকান", "American football is popular in the United States."],
+  "among": ["মধ্যে", "She was among the first to arrive."],
+  "amount": ["পরিমাণ", "A large amount of money was donated to charity."],
+  "analysis": ["বিশ্লেষণ", "The data analysis revealed interesting patterns."],
+  "analyst": ["বিশ্লেষক", "The financial analyst predicted market growth."],
+  "analyze": ["বিশ্লেষণ করা", "Scientists analyze samples in the laboratory."],
+  "ancient": ["প্রাচীন", "We visited ancient ruins in Greece."],
+  "and": ["এবং", "I need milk and sugar for the recipe."],
+  "anger": ["রাগ", "His anger was evident from his red face."],
+  "angle": ["কোণ", "The photographer changed his angle to get a better shot."],
+  "angry": ["রাগান্বিত", "She was angry when her brother broke her toy."],
+  "animal": ["প্রাণী", "The lion is a wild animal."],
+  "anniversary": ["বার্ষিকী", "Today is our wedding anniversary."],
+  "announce": ["ঘোষণা করা", "They will announce the results tomorrow."],
+  "annual": ["বাৎসরিক", "The company holds its annual meeting in December."],
+  "another": ["অন্য", "Would you like another cup of tea?"],
+  "answer": ["উত্তর", "Please write your answer on the paper."],
+  "anticipate": ["আগে থেকে মনে করা", "We anticipate a large crowd at the concert."],
+  "anxiety": ["উদ্বেগ", "She felt anxiety before her exam."],
+  "any": ["কোন", "Do you have any questions?"],
+  "anybody": ["কেউ", "Is anybody there?"],
+  "anymore": ["আর", "He doesn't live here anymore."],
+  "anyone": ["কেউ", "Can anyone help me with this heavy box?"],
+  "anything": ["কিছু", "You can ask me anything you want to know."],
+  "anyway": ["যাইহোক", "I don't need help, but thank you anyway."],
+  "anywhere": ["যেকোনো জায়গায়", "You can sit anywhere you like."],
+  "apart": ["পৃথক", "The two houses are set apart from each other."],
+  "apartment": ["অ্যাপার্টমেন্ট", "They rent a small apartment in the city."],
+  "apparent": ["স্পষ্ট", "It was apparent that she was upset."],
+  "apparently": ["দৃশ্যত", "Apparently, the meeting has been canceled."],
+  "appeal": ["আবেদন", "The charity made an appeal for donations."],
+  "appear": ["দেখা দেওয়া", "The stars appear at night."],
+  "appearance": ["উপস্থিতি", "His sudden appearance surprised everyone."],
+  "apple": ["আপেল", "She eats an apple every day for health."],
+  "application": ["আবেদন", "Submit your job application by Friday."],
+  "apply": ["প্রয়োগ করা", "You should apply sunscreen before going outside."],
+  "appoint": ["নিয়োগ করা", "The committee will appoint a new manager."],
+  "appointment": ["নিয়োগ", "I have a doctor's appointment tomorrow."],
+  "appreciate": ["প্রশংসা করা", "I appreciate your help with this project."],
+  "approach": ["অভিগমন / পদ্ধতি", "The plane began its approach to the runway."],
+  "appropriate": ["উপযুক্ত/যথাযথ", "Please wear appropriate clothing for the interview."],
+  "approval": ["অনুমোদন", "We need the manager's approval for this plan."],
+  "approve": ["অনুমোদন করা", "The board will approve the budget next week."],
+  "approximately": ["প্রায়", "The journey takes approximately three hours."],
+  "Arab": ["আরব", "Arab culture has a rich history."],
+  "architect": ["স্থপতি", "The architect designed a beautiful modern house."],
+  "area": ["এলাকা", "This area is known for its historical buildings."],
+  "argue": ["তর্ক করা", "They often argue about politics."],
+  "argument": ["যুক্তি", "He presented a strong argument in the debate."],
+  "arise": ["উত্থান", "Problems may arise if we are not careful."],
+  "arm": ["বাহু", "She broke her arm in a cycling accident."],
+  "armed": ["সশস্ত্র", "The armed guards protect the building."],
+  "army": ["সেনাবাহিনী", "My brother serves in the army."],
+  "around": ["চারপাশে", "There are many trees around our house."],
+  "arrange": ["ব্যবস্থা করা", "She will arrange a meeting for next week."],
+  "arrangement": ["ব্যবস্থা", "The flower arrangement was beautiful."],
+  "arrest": ["গ্রেপ্তার", "The police will arrest the thief."],
+  "arrival": ["আগমন", "We await the arrival of our guests."],
+  "arrive": ["পৌঁছানো", "The train will arrive at 5 PM."],
+  "art": ["শিল্প", "Modern art can be difficult to understand."],
+  "article": ["নিবন্ধ/প্রবন্ধ", "He wrote an article for the newspaper."],
+  "artist": ["শিল্পী", "The artist painted a beautiful landscape."],
+  "artistic": ["শৈল্পিক", "She has an artistic talent for drawing."],
+  "as": ["যেমন", "As you know, practice makes perfect."],
+  "Asian": ["এশীয়", "Asian cuisine is very diverse."],
+  "aside": ["একপাশে", "He stepped aside to let her pass."],
+  "ask": ["জিজ্ঞাসা করা", "Don't hesitate to ask for help."],
+  "asleep": ["ঘুমন্ত", "The baby is asleep in the crib."],
+  "aspect": ["দিক", "We must consider every aspect of the problem."],
+  "assault": ["আক্রমণ", "The assault on the fortress was successful."],
+  "assert": ["জোর দিয়ে বলা", "She asserted her innocence in court."],
+  "assess": ["মূল্যায়ন করা", "Teachers assess students' progress regularly."],
+  "assessment": ["মূল্যায়ন", "The assessment of the project was positive."],
+  "asset": ["সম্পদ", "Our employees are our greatest asset."],
+  "assign": ["নির্ধারণ করা", "The teacher will assign homework today."],
+  "assignment": ["নির্ধারিত কাজ", "The assignment must be completed by Monday."],
+  "assist": ["সাহায্য করা", "Can you assist me with this heavy box?"],
+  "assistance": ["সাহায্য", "I need your assistance to move this table."],
+  "assistant": ["সহকারী", "The manager's assistant scheduled the meeting."],
+  "associate": ["সহযোগী", "She is an associate professor at the university."],
+  "association": ["সমিতি/সংঘ", "He is a member of the local business association."],
+  "assume": ["ধরে নেওয়া", "Let's assume that everything goes according to plan."],
+  "assumption": ["অনুমান/ধারণা", "His assumption turned out to be wrong."],
+  "assure": ["আশ্বাস দেওয়া", "I assure you that everything will be fine."],
+  "at": ["এ", "Meet me at the coffee shop."],
+  "athlete": ["ক্রীড়াবিদ", "The athlete trained hard for the competition."],
+  "athletic": ["ক্রীড়া সংক্রান্ত", "She has an athletic build."],
+  "atmosphere": ["বায়ুমণ্ডল", "The atmosphere in the room was tense."],
+  "attach": ["সংযুক্ত করা", "Please attach the file to your email."],
+  "attack": ["আক্রমণ", "The army launched an attack at dawn."],
+  "attempt": ["চেষ্টা", "His attempt to break the record failed."],
+  "attend": ["উপস্থিত থাকা", "I will attend the conference next week."],
+  "attention": ["মনোযোগ", "Pay attention to the road while driving."],
+  "attitude": ["মনোভাব", "Her positive attitude is inspiring."],
+  "attorney": ["আইনজীবী", "The attorney defended his client in court."],
+  "attract": ["আকর্ষণ করা", "The bright lights attract insects."],
+  "attractive": ["আকর্ষণীয়", "She is an attractive and intelligent woman."],
+  "attribute": ["বৈশিষ্ট্য / গুণ / আরোপ করা", "Patience is a valuable attribute."],
+  "audience": ["শ্রোতা", "The audience applauded after the performance."],
+  "author": ["লেখক", "The author signed copies of her new book."],
+  "authority": ["কর্তৃপক্ষ", "The local authority approved the building plans."],
+  "auto": ["স্বয়ংক্রিয়", "The auto industry is growing rapidly."],
+  "available": ["উপলভ্য / উপলব্ধ", "Is this dress available in my size?"],
+  "average": ["গড়", "The average temperature in July is 30°C."],
+  "avoid": ["এড়ানো", "Try to avoid making the same mistake again."],
+  "award": ["পুরস্কার", "She received an award for her bravery."],
+  "aware": ["সচেতন", "Are you aware of the new regulations?"],
+  "awareness": ["সচেতনতা", "The campaign aims to raise awareness about climate change."],
+  "away": ["দূরে", "The beach is two miles away from here."],
+  "awful": ["ভয়ানক", "The weather was awful during our vacation."],
+  "baby": ["শিশু", "The baby is sleeping peacefully."],
+  "back": ["পিছনে", "She sat in the back of the classroom."],
+  "background": ["পটভূমি", "His background in engineering helps him in this job."],
+  "bad": ["খারাপ", "Eating too much junk food is bad for your health."],
+  "badly": ["খারাপভাবে", "The car was badly damaged in the accident."],
+  "bag": ["ব্যাগ", "She carries her books in a leather bag."],
+  "bake": ["স্যাঁকা / সেঁকা", "I love to bake cookies on weekends."],
+  "balance": ["ভারসাম্য", "It's important to maintain a balance between work and life."],
+  "ball": ["বল", "The children are playing with a ball in the park."],
+  "ban": ["নিষেধাজ্ঞা / নিষিদ্ধ করা", "The government imposed a ban on smoking in public places."],
+  "band": ["দল / ব্যান্ড", "The band performed at the concert last night."],
+  "bank": ["ব্যাংক", "I need to go to the bank to deposit some money."],
+  "bar": ["বার", "They met at a bar for a drink."],
+  "barely": ["সবে মাত্র", "She could barely see through the thick fog."],
+  "barrel": ["নল / পিপা", "The old winery still uses wooden barrels."],
+  "barrier": ["বাধা", "Language can be a barrier to communication."],
+  "base": ["ভিত্তি", "The base of the statue is made of marble."],
+  "baseball": ["বেসবল", "He plays baseball with his friends every weekend."],
+  "basic": ["মৌলিক", "She learned the basic principles of mathematics."],
+  "basically": ["মূলত", "Basically, the idea is to reduce costs."],
+  "basis": ["ভিত্তি", "We meet on a regular basis to discuss progress."],
+  "basket": ["ঝুড়ি", "She carries a basket of fruits from the market."],
+  "basketball": ["বাস্কেটবল", "Basketball is a popular sport in America."],
+  "bathroom": ["গোসলখানা", "The bathroom is on the left side of the hallway."],
+  "battery": ["ব্যাটারি", "The remote control needs new batteries."],
+  "battle": ["যুদ্ধ", "The battle lasted for several days."],
+  "be": ["হতে", "She wants to be a doctor when she grows up."],
+  "beach": ["সৈকত", "We spent the day relaxing on the beach."],
+  "bean": ["শিম", "She added beans to the soup for extra protein."],
+  "bear": ["ভালুক / সহ্য করা", "The bear is a large mammal found in the forest."],
+  "beat": ["পিটানো / হারানো", "He can beat the drum very well."],
+  "beautiful": ["সুন্দর", "The sunset over the ocean was beautiful."],
+  "beauty": ["সৌন্দর্য", "The beauty of nature is breathtaking."],
+  "because": ["কারণ", "We stayed indoors because it was raining."],
+  "become": ["হয়ে ওঠা", "She wants to become a successful entrepreneur."],
+  "bed": ["বিছানা", "I go to bed at 10 PM every night."],
+  "bedroom": ["শোবার ঘর", "Her bedroom is painted in light blue."],
+  "beer": ["বিয়ার", "He ordered a cold beer at the restaurant."],
+  "before": ["আগে", "Please finish your homework before going out to play."],
+  "begin": ["শুরু করা", "The concert will begin in ten minutes."],
+  "beginning": ["শুরু", "The beginning of the movie was very exciting."],
+  "behavior": ["আচরণ", "His behavior in class has improved."],
+  "behind": ["পিছনে", "The cat is hiding behind the sofa."],
+  "being": ["থাকা / সত্তা", "Human beings are capable of great kindness."],
+  "belief": ["বিশ্বাস", "Her belief in hard work is strong."],
+  "believe": ["বিশ্বাস করা", "I believe that honesty is the best policy."],
+  "bell": ["ঘন্টা", "The school bell rings at 3 PM."],
+  "belong": ["অন্তর্ভুক্ত", "These books belong to the library."],
+  "below": ["নিচে", "The temperature is below freezing today."],
+  "belt": ["বেল্ট", "He tightened his belt before the race."],
+  "bench": ["বেঞ্চ", "They sat on a bench in the park."],
+  "bend": ["বাঁকা", "Be careful not to bend the pages of the book."],
+  "beneath": ["নিচে", "The cat is sleeping beneath the table."],
+  "benefit": ["সুবিধা", "Regular exercise has many health benefits."],
+  "beside": ["পাশে", "She sat beside her friend in class."],
+  "besides": ["এছাড়াও", "Besides English, she speaks Spanish and French."],
+  "best": ["সেরা", "This is the best movie I have ever seen."],
+  "bet": ["বাজি", "I bet you can't solve this puzzle in one minute."],
+  "better": ["উত্তম", "Your handwriting is better than mine."],
+  "between": ["মধ্যে", "The agreement was between the two companies."],
+  "beyond": ["অতিক্রম / বাইরে", "The mountains are beyond the river."],
+  "Bible": ["বাইবেল", "The Bible is a holy book for Christians."],
+  "big": ["বড়", "They live in a big house in the suburbs."],
+  "bike": ["সাইকেল", "He rides his bike to work every day."],
+  "bill": ["বিল", "I paid the electricity bill yesterday."],
+  "billion": ["বিলিয়ন", "The company is worth billions of dollars."],
+  "bind": ["বাঁধা", "She used a rope to bind the boxes together."],
+  "biological": ["জৈবিক", "Biological processes are complex."],
+  "bird": ["পাখি", "A beautiful bird is singing outside my window."],
+  "birth": ["জন্ম", "The birth of a baby is a joyful event."],
+  "birthday": ["জন্মদিন", "We celebrated her birthday with a cake and gifts."],
+  "bit": ["কিছুটা", "She is feeling a bit tired today."],
+  "bite": ["কামড়", "The mosquito bite left a red mark on my arm."],
+  "black": ["কালো", "She wore a black dress to the party."],
+  "blade": ["ব্লেড", "The blade of the knife is very sharp."],
+  "blame": ["দোষ", "Don't blame others for your mistakes."],
+  "blanket": ["কম্বল", "I need a warm blanket on cold nights."],
+  "blind": ["অন্ধ", "The blind man uses a stick to walk."],
+  "block": ["ব্লক", "The children built a tower with wooden blocks."],
+  "blood": ["রক্ত", "Blood carries oxygen to all parts of the body."],
+  "blow": ["ফুঁ দেওয়া", "Blow out the candles on your birthday cake."],
+  "blue": ["নীল", "The sky is clear and blue today."],
+  "board": ["বোর্ড", "The teacher wrote on the whiteboard."],
+  "boat": ["নৌকা", "We went fishing in a small boat."],
+  "body": ["শরীর", "Regular exercise keeps your body healthy."],
+  "bomb": ["বোমা", "The bomb was safely defused by experts."],
+  "bombing": ["বোমাবর্ষণ", "The bombing caused significant damage to the city."],
+  "bond": ["বন্ধন", "There is a strong bond between the two sisters."],
+  "bone": ["হাড়", "The dog buried a bone in the garden."],
+  "book": ["বই", "I am reading an interesting book."],
+  "boom": ["অবিশ্বাস্য বৃদ্ধি", "The economy experienced a boom in the 1990s."],
+  "boot": ["বুট", "He wears leather boots in the winter."],
+  "border": ["সীমানা", "The river forms the border between the two countries."],
+  "born": ["জন্মগ্রহণ করা", "She was born in a small village."],
+  "borrow": ["ধার করা", "Can I borrow your pen for a moment?"],
+  "boss": ["মনিব", "My boss is very understanding and supportive."],
+  "both": ["উভয়", "Both of my parents are teachers."],
+  "bother": ["বিরক্ত করা", "Don't bother him while he's working."],
+  "bottle": ["বোতল", "She drank a bottle of water after her workout."],
+  "bottom": ["নিচ", "The keys are at the bottom of my bag."],
+  "boundary": ["সীমানা", "The fence marks the boundary of our property."],
+  "bowl": ["বাটি", "She ate a bowl of cereal for breakfast."],
+  "box": ["বাক্স", "The gift came in a small box."],
+  "boy": ["ছেলে", "The boy is playing with his toy car."],
+  "boyfriend": ["বন্ধু", "She went to the movies with her boyfriend."],
+  "brain": ["মস্তিষ্ক", "The human brain is a complex organ."],
+  "branch": ["শাখা", "The bank has a branch in every city."],
+  "brand": ["ব্র্যান্ড", "This brand of shoes is very popular."],
+  "bread": ["রুটি", "We eat bread with butter for breakfast."],
+  "break": ["ভাঙ্গা", "Be careful not to break the glass."],
+  "breakfast": ["সকালের খাবার", "I usually have eggs for breakfast."],
+  "breast": ["স্তন", "Breast cancer awareness is important for women's health."],
+  "breath": ["শ্বাস", "Take a deep breath and relax."],
+  "breathe": ["শ্বাস নেওয়া", "It's hard to breathe in a smoky room."],
+  "brick": ["ইট", "The house is built with red bricks."],
+  "bridge": ["সেতু", "The old bridge was destroyed in the flood."],
+  "brief": ["সংক্ষিপ্ত", "He gave a brief introduction about himself."],
+  "briefly": ["সংক্ষেপে", "She explained the plan briefly."],
+  "bright": ["উজ্জ্বল", "The sun is bright today."],
+  "brilliant": ["উজ্জ্বল", "She gave a brilliant performance on stage."],
+  "bring": ["আনা", "Please bring your ID card tomorrow."],
+  "British": ["ব্রিটিশ", "British English is slightly different from American English."],
+  "broad": ["প্রশস্ত", "The river is very broad at this point."],
+  "broken": ["ভাঙ্গা", "The broken window needs to be fixed."],
+  "brother": ["ভাই", "My brother is older than me."],
+  "brown": ["বাদামী", "She has brown eyes and brown hair."],
+  "brush": ["ব্রাশ", "I brush my teeth twice a day."],
+  "buck": ["ডলার", "This book costs twenty bucks."],
+  "budget": ["বাজেট", "We need to stick to our budget this month."],
+  "build": ["গড়া", "They plan to build a new school in the village."],
+  "building": ["ভবন", "That building is the tallest in the city."],
+  "bullet": ["গুলি", "The bullet missed the target."],
+  "bunch": ["গুচ্ছ", "She bought a bunch of bananas from the market."],
+  "burden": ["বোঝা", "He feels the burden of responsibility."],
+  "burn": ["পোড়া", "Be careful not to burn your fingers."],
+  "bury": ["পুঁতে ফেলা", "They bury their treasures in the sand."],
+  "bus": ["বাস", "I take the bus to work every day."],
+  "business": ["ব্যবসা", "He runs a successful business."],
+  "busy": ["ব্যস্ত", "She is busy with her project this week."],
+  "but": ["কিন্তু", "I wanted to go, but I was too tired."],
+  "butter": ["মাখন", "She spreads butter on her toast."],
+  "button": ["বোতাম", "Press the button to start the machine."],
+  "buy": ["কিনা", "I want to buy a new laptop."],
+  "buyer": ["ক্রেতা", "The buyer was satisfied with the product."],
+  "by": ["দ্বারা", "The book was written by a famous author."],
+  "cabin": ["কেবিন", "We stayed in a cozy log cabin in the mountains."],
+  "cabinet": ["মন্ত্রিসভা / আলমারি", "The kitchen cabinet is full of dishes."],
+  "cable": ["কেবল", "The cable television connection is not working."],
+  "cake": ["পিষ্টক / পিঠা", "She baked a chocolate cake for my birthday."],
+  "calculate": ["গণনা করা", "Can you calculate the total cost of these items?"],
+  "call": ["ডাকা", "I will call you tomorrow evening."],
+  "camera": ["ক্যামেরা", "She bought a new camera for her photography hobby."],
+  "camp": ["শিবির", "The children will go to summer camp next month."],
+  "campaign": ["প্রচারণা", "The political campaign was very active before the election."],
+  "campus": ["ক্যাম্পাস / বিদ্যায়তন", "The university campus is very beautiful in spring."],
+  "can": ["পারা", "I can speak three languages."],
+  "Canadian": ["কানাডিয়ান", "Canadian winters are very cold."],
+  "cancer": ["ক্যান্সার", "Early detection is important in treating cancer."],
+  "candidate": ["প্রার্থী", "There are three candidates for the position."],
+  "cap": ["টুপি", "He wore a baseball cap to protect himself from the sun."],
+  "capability": ["সামর্থ্য", "This machine has the capability to process large amounts of data."],
+  "capable": ["সক্ষম", "She is capable of handling difficult situations."],
+  "capacity": ["ধারণক্ষমতা", "The hall has a seating capacity of five hundred people."],
+  "capital": ["রাজধানী", "Dhaka is the capital of Bangladesh."],
+  "captain": ["ক্যাপ্টেন", "The captain guided the ship safely through the storm."],
+  "capture": ["ধরা / ধৃত করা", "The police managed to capture the thief."],
+  "car": ["গাড়ি", "We traveled to the countryside by car."],
+  "carbon": ["কার্বন", "Carbon dioxide is a greenhouse gas."],
+  "card": ["কার্ড", "She received a birthday card from her friend."],
+  "care": ["যত্ন", "Take good care of your health."],
+  "career": ["পেশা", "She has a successful career in medicine."],
+  "careful": ["সতর্ক", "Be careful when you cross the road."],
+  "carefully": ["সাবধানে", "Read the instructions carefully before starting."],
+  "carrier": ["বাহক", "Mosquitoes are carriers of some diseases."],
+  "carry": ["বহন করা", "Can you help me carry these boxes?"],
+  "case": ["মামলা", "The lawyer discussed the details of the case."],
+  "cash": ["নগদ", "I paid for the groceries in cash."],
+  "cast": ["নিক্ষেপ করা", "The fisherman cast his net into the river."],
+  "cat": ["বিড়াল", "The cat is sleeping on the sofa."],
+  "catch": ["ধরা", "Try to catch the ball before it hits the ground."],
+  "category": ["বিভাগ", "This product falls into the electronics category."],
+  "Catholic": ["ক্যাথলিক", "She attends a Catholic church every Sunday."],
+  "cause": ["কারণ", "Smoking is a major cause of lung cancer."],
+  "ceiling": ["ছাদ", "The ceiling of the room is painted white."],
+  "celebrate": ["উদযাপন করা", "We celebrate Independence Day every year."],
+  "celebration": ["উদযাপন", "The wedding celebration lasted for three days."],
+  "celebrity": ["যশস্বী ব্যক্তি", "The celebrity was surrounded by fans."],
+  "cell": ["কোষ", "The human body is made up of millions of cells."],
+  "center": ["কেন্দ্র", "The community center offers various activities."],
+  "central": ["কেন্দ্রীয়", "The central idea of the book is about love."],
+  "century": ["শতাব্দী", "We live in the twenty-first century."],
+  "CEO": ["প্রধান নির্বাহী কর্মকর্তা", "The CEO announced the company's new strategy."],
+  "ceremony": ["অনুষ্ঠান", "The graduation ceremony will be held next week."],
+  "certain": ["নির্দিষ্ট", "I am certain that I locked the door."],
+  "certainly": ["নিশ্চিতভাবে", "I will certainly attend your party."],
+  "chain": ["শৃঙ্খল / শিকল", "She wore a beautiful gold chain around her neck."],
+  "chair": ["চেয়ার", "Please pull up a chair and join us."],
+  "chairman": ["সভাপতি", "The chairman opened the meeting at 10 AM."],
+  "challenge": ["চ্যালেঞ্জ", "Learning a new language is a fun challenge."],
+  "chamber": ["কক্ষ", "The members met in the council chamber."],
+  "champion": ["চ্যাম্পিয়ন", "She is the defending champion of the tournament."],
+  "championship": ["চ্যাম্পিয়নশিপ", "Our team won the national championship."],
+  "chance": ["সুযোগ", "This is your chance to prove yourself."],
+  "change": ["পরিবর্তন", "Change is the only constant in life."],
+  "changing": ["পরিবর্তনশীল", "The changing weather made it difficult to plan the picnic."],
+  "channel": ["চ্যানেল", "I watch the news on this channel every evening."],
+  "chapter": ["অধ্যায়", "The first chapter of the book is very interesting."],
+  "character": ["চরিত্র", "Honesty is an important character trait."],
+  "characteristic": ["বৈশিষ্ট্য", "One characteristic of mammals is that they have hair."],
+  "characterize": ["চিহ্নিত করা", "His work is characterized by attention to detail."],
+  "charge": ["চার্জ", "There is no charge for this service."],
+  "charity": ["দান", "He donated a large sum of money to charity."],
+  "chart": ["ছক", "The chart shows the company's growth over five years."],
+  "chase": ["তাড়া করা / ধাত্তয়া", "The cat likes to chase birds in the garden."],
+  "cheap": ["সস্তা", "These shoes were very cheap but of good quality."],
+  "check": ["পরীক্ষা করা", "Please check your answers before submitting."],
+  "cheek": ["গাল", "She kissed her baby on the cheek."],
+  "cheese": ["পনির", "I like to put cheese on my sandwich."],
+  "chef": ["রাঁধুনি", "The chef prepared a delicious meal for us."],
+  "chemical": ["রাসায়নিক", "Handle these chemical substances with care."],
+  "chest": ["বুক", "He felt a pain in his chest and went to the doctor."],
+  "chicken": ["মুরগি", "We had roasted chicken for dinner."],
+  "chief": ["প্রধান", "The chief guest will arrive at 5 PM."],
+  "child": ["শিশু", "Every child has the right to education."],
+  "childhood": ["শৈশব", "She has fond memories of her childhood."],
+  "Chinese": ["চীনা", "Chinese food is very popular worldwide."],
+  "chip": ["চিপ", "I like to eat potato chips with my sandwich."],
+  "chocolate": ["চকলেট", "Dark chocolate is my favorite."],
+  "choice": ["পছন্দ", "You have a choice between tea and coffee."],
+  "cholesterol": ["কোলেস্টেরল", "High cholesterol can lead to heart problems."],
+  "choose": ["পছন্দ করা", "You can choose any book from the library."],
+  "Christian": ["খ্রিস্টান", "Christmas is an important Christian holiday."],
+  "Christmas": ["ক্রিসমাস", "We decorate a tree during Christmas."],
+  "church": ["গির্জা", "They go to church every Sunday."],
+  "cigarette": ["সিগারেট", "Smoking cigarettes is harmful to health."],
+  "circle": ["বৃত্ত", "Draw a circle with this compass."],
+  "circumstance": ["পরিস্থিতি", "Under no circumstances should you open that door."],
+  "cite": ["উদ্ধৃত করা", "The researcher cited several sources in her paper."],
+  "citizen": ["নাগরিক", "Every citizen has the right to vote."],
+  "city": ["শহর", "New York is a busy city."],
+  "civil": ["বেসামরিক", "Civil society plays an important role in democracy."],
+  "civilian": ["বেসামরিক ব্যক্তি", "The bomb killed ten civilians."],
+  "claim": ["দাবি করা", "He claims to have seen a UFO."],
+  "class": ["শ্রেণী", "She is at the top of her class."],
+  "classic": ["সর্বোত্তম / ​বিশুদ্ধ / উচ্চশ্রেণীত্তয়ালা", "This novel is a classic of English literature."],
+  "classroom": ["শ্রেণীকক্ষ", "The classroom was clean and bright."],
+  "clean": ["পরিষ্কার", "Keep your room clean and tidy."],
+  "clear": ["পরিষ্কার", "The water in the lake is very clear."],
+  "clearly": ["স্পষ্টভাবে", "Please speak clearly so everyone can understand."],
+  "client": ["গ্রাহক", "The lawyer met with her client."],
+  "climate": ["জলবায়ু", "The climate in this region is tropical."],
+  "climb": ["আরোহণ করা", "We plan to climb the mountain tomorrow."],
+  "clinic": ["ক্লিনিক", "She goes to the dental clinic for regular checkups."],
+  "clinical": ["ক্লিনিক্যাল", "The drug is still in the clinical trial phase."],
+  "clock": ["ঘড়ি", "The clock on the wall shows 3 o'clock."],
+  "close": ["বন্ধ", "Please close the door when you leave."],
+  "closely": ["ঘনিষ্ঠভাবে", "The teacher observed the students closely."],
+  "closer": ["নিকটবর্তী", "Move a bit closer so I can see you."],
+  "clothes": ["জামাকাপড়", "She bought new clothes for the party."],
+  "clothing": ["পরিধেয়", "This store sells warm clothing for winter."],
+  "cloud": ["মেঘ", "The sky is covered with dark clouds."],
+  "club": ["ক্লাব", "He is a member of the local sports club."],
+  "clue": ["সংকেত", "The police are looking for clues to solve the crime."],
+  "cluster": ["গুচ্ছ", "A cluster of stars can be seen in the night sky."],
+  "coach": ["কোচ", "The football coach trained the team hard."],
+  "coal": ["কয়লা", "Coal is used as a fuel in many industries."],
+  "coalition": ["জোট", "A coalition of parties formed the government."],
+  "coast": ["উপকূল", "We drove along the coast and enjoyed the view."],
+  "coat": ["কোট", "Wear a warm coat in cold weather."],
+  "code": ["কোড", "You need to enter the security code."],
+  "coffee": ["কফি", "I drink a cup of coffee every morning."],
+  "cognitive": ["জ্ঞানীয়", "Cognitive development is important in early childhood."],
+  "cold": ["ঠান্ডা", "It's cold outside, so wear a sweater."],
+  "collapse": ["ধস / পতন", "The old building may collapse in an earthquake."],
+  "colleague": ["সহকর্মী", "My colleague helped me with the project."],
+  "collect": ["সংগ্রহ করা", "She likes to collect stamps."],
+  "collection": ["সংগ্রহ", "He has a large collection of rare books."],
+  "collective": ["সমষ্টিগত", "We made a collective decision."],
+  "college": ["কলেজ", "She is studying at a medical college."],
+  "colonial": ["ঔপনিবেশিক", "Many Asian countries were under colonial rule."],
+  "color": ["রং", "My favorite color is blue."],
+  "column": ["স্তম্ভ", "The newspaper article filled two columns."],
+  "combination": ["সংমিশ্রণ", "A combination of factors led to his success."],
+  "combine": ["মিশ্রিত করা", "Combine the flour and eggs to make the dough."],
+  "come": ["আসা", "Please come to my house tomorrow."],
+  "comedy": ["কমেডি", "We watched a comedy movie last night."],
+  "comfort": ["সান্ত্বনা", "Her words gave me great comfort."],
+  "comfortable": ["আরামদায়ক", "This chair is very comfortable."],
+  "command": ["আদেশ", "The officer gave the command to attack."],
+  "commander": ["কমান্ডার", "The commander led his troops bravely."],
+  "comment": ["মন্তব্য", "He made a positive comment about my work."],
+  "commercial": ["বাণিজ্যিক", "The commercial break interrupted the show."],
+  "commission": ["কমিশন", "She earns a commission on every sale."],
+  "commit": ["প্রতিশ্রুতিবদ্ধ", "He committed himself to the cause."],
+  "commitment": ["প্রতিশ্রুতি", "She has a strong commitment to her family."],
+  "committee": ["কমিটি", "A committee was formed to address the issue."],
+  "common": ["সাধারণ", "It's common to feel nervous before an exam."],
+  "communicate": ["যোগাযোগ করা", "We communicate through email."],
+  "communication": ["যোগাযোগ", "Good communication is key to a healthy relationship."],
+  "community": ["সম্প্রদায়", "The local community organized a charity event."],
+  "company": ["কোম্পানি", "He works for a software company."],
+  "compare": ["তুলনা করা", "Compare the prices before you buy."],
+  "comparison": ["তুলনা", "There is no comparison between the two products."],
+  "compete": ["প্রতিযোগিতা করা", "Athletes from all over the world compete in the Olympics."],
+  "competition": ["প্রতিযোগিতা", "The competition was very tough."],
+  "competitive": ["প্রতিযোগিতামূলক", "She has a competitive spirit."],
+  "competitor": ["প্রতিদ্বন্দ্বী", "Our main competitor launched a new product."],
+  "complain": ["অভিযোগ করা", "Customers may complain if the service is poor."],
+  "complaint": ["অভিযোগ", "The manager listened to the customer's complaint."],
+  "complete": ["সম্পূর্ণ", "Please complete the form and submit it."],
+  "completely": ["সম্পূর্ণরূপে", "I completely agree with you."],
+  "complex": ["জটিল", "This is a complex problem with no easy solution."],
+  "complicated": ["জটিল", "The instructions are too complicated to follow."],
+  "component": ["উপাদান", "Each component of the machine is essential."],
+  "compose": ["রচনা করা", "Mozart composed many symphonies."],
+  "composition": ["রচনা", "The composition of the soil affects plant growth."],
+  "comprehensive": ["ব্যাপক", "The report provides a comprehensive analysis."],
+  "computer": ["কম্পিউটার", "I use a computer for my work."],
+  "concentrate": ["মনোযোগ দেত্তয়া", "You need to concentrate on your studies."],
+  "concentration": ["ঘনত্ব / একাগ্রতা / কেন্দ্রীকরণ", "The concentration of salt in the water is high."],
+  "concept": ["ধারণা", "The concept of democracy is important."],
+  "concern": ["চিন্তা", "His health is a major concern for us."],
+  "concerned": ["চিন্তিত", "I am concerned about your safety."],
+  "concert": ["সঙ্গীতানুষ্ঠান", "We went to a rock concert last weekend."],
+  "conclude": ["উপসংহার", "The meeting will conclude at 5 PM."],
+  "conclusion": ["উপসংহার", "The conclusion of the story was surprising."],
+  "concrete": ["কংক্রিট", "The building is made of concrete and steel."],
+  "condition": ["শর্ত", "The car is in good condition."],
+  "conduct": ["পরিচালনা করা", "The teacher will conduct the experiment."],
+  "conference": ["সম্মেলন", "An international conference was held in the city."],
+  "confidence": ["আত্মবিশ্বাস", "She spoke with confidence."],
+  "confident": ["আত্মবিশ্বাসী", "He is confident that he will pass the exam."],
+  "confirm": ["নিশ্চিত করা", "Please confirm your attendance by tomorrow."],
+  "conflict": ["সংঘাত", "The conflict between the two countries ended."],
+  "confront": ["মুখোমুখি হওয়া", "You must confront your fears."],
+  "confusion": ["বিভ্রান্তি", "There was confusion about the meeting time."],
+  "Congress": ["কংগ্রেস", "The US Congress passed the bill."],
+  "congressional": ["কংগ্রেসসংক্রান্ত", "The congressional hearing was televised."],
+  "connect": ["সংযোগ করা", "Connect the wires properly."],
+  "connection": ["সংযোগ", "There is a connection between smoking and cancer."],
+  "consciousness": ["চেতনা", "He lost consciousness after the accident."],
+  "consensus": ["ঐকমত্য", "The group reached a consensus on the issue."],
+  "consequence": ["পরিণতি", "Think about the consequences of your actions."],
+  "conservative": ["রক্ষণশীল", "He has conservative views on politics."],
+  "consider": ["বিবেচনা করা", "Consider all options before deciding."],
+  "considerable": ["উল্লেখযোগ্য / বিবেচনাযোগ্য", "She has made considerable progress."],
+  "consideration": ["বিবেচনা", "After careful consideration, I accepted the offer."],
+  "consist": ["গঠিত", "The team consists of five members."],
+  "consistent": ["সামঞ্জস্যপূর্ণ / সুসংগত", "Her performance has been consistent."],
+  "constant": ["ধ্রুব", "The constant noise was annoying."],
+  "constantly": ["নিরবচ্ছিন্নভাবে", "Technology is constantly changing."],
+  "constitute": ["গঠন করা", "Twelve months constitute a year."],
+  "constitutional": ["সাংবিধানিক", "Freedom of speech is a constitutional right."],
+  "construct": ["নির্মাণ করা", "They will construct a new bridge here."],
+  "construction": ["নির্মাণ", "The construction of the highway is complete."],
+  "consultant": ["পরামর্শদাতা", "The company hired a consultant to improve efficiency."],
+  "consume": ["খরচ করা", "The car consumes a lot of fuel."],
+  "consumer": ["ভোক্তা", "Consumer demand affects production."],
+  "consumption": ["খরচ", "The consumption of electricity has increased."],
+  "contact": ["যোগাযোগ", "Please contact me if you have any questions."],
+  "contain": ["ধারণ করা", "This box contains old photographs."],
+  "container": ["ধারক", "Store the food in an airtight container."],
+  "contemporary": ["সমসাময়িক", "Contemporary art is sometimes difficult to understand."],
+  "content": ["সন্তুষ্ট", "He is content with his simple life."],
+  "contest": ["প্রতিযোগিতা", "She won first prize in the singing contest."],
+  "context": ["প্রসঙ্গ", "Consider the context of the situation."],
+  "continue": ["চালিয়ে যাওয়া", "Please continue with your work."],
+  "continued": ["অব্যাহত", "Continued efforts led to success."],
+  "contract": ["চুক্তি", "Sign the contract before starting the job."],
+  "contrast": ["বিপরীত", "There is a sharp contrast between the two brothers."],
+  "contribute": ["অবদান রাখা", "Everyone should contribute to society."],
+  "contribution": ["অবদান", "Her contribution to science is significant."],
+  "control": ["নিয়ন্ত্রণ", "He lost control of the car on the icy road."],
+  "controversial": ["বিতর্কিত", "The decision was controversial."],
+  "controversy": ["বিতর্ক", "The new law caused a lot of controversy."],
+  "convention": ["সম্মেলন", "The political convention was held in July."],
+  "conventional": ["প্রচলিত", "Conventional methods are sometimes outdated."],
+  "conversation": ["কথোপকথন", "We had a long conversation about life."],
+  "convert": ["রূপান্তর করা", "Convert the measurements from inches to centimeters."],
+  "conviction": ["দৃঢ় বিশ্বাস", "He spoke with conviction about his beliefs."],
+  "convince": ["বোঝানো / উপলব্ধি করানো", "I tried to convince him to join us."],
+  "cook": ["রান্না করা", "My mother cooks delicious food."],
+  "cookie": ["কুকি", "The children ate chocolate cookies."],
+  "cooking": ["রান্না", "Cooking is both an art and a science."],
+  "cool": ["শীতল", "The weather is cool today."],
+  "cooperation": ["সহযোগিতা", "Thank you for your cooperation."],
+  "cop": ["পুলিশ", "The cop directed the traffic."],
+  "cope": ["মোকাবেলা করা", "It's difficult to cope with stress."],
+  "copy": ["কপি", "Make a copy of this document."],
+  "core": ["মূল", "The core issue is lack of funding."],
+  "corn": ["ভুট্টা", "We grow corn in our field."],
+  "corner": ["কোণ", "The bank is at the corner of the street."],
+  "corporate": ["কর্পোরেট", "Corporate culture varies from company to company."],
+  "corporation": ["পৌরসভা", "He works for a large corporation."],
+  "correct": ["সঠিক", "Your answer is correct."],
+  "correspondent": ["সংবাদদাতা", "The foreign correspondent reported from the war zone."],
+  "cost": ["খরচ", "The cost of living has increased."],
+  "cotton": ["তুলা", "Cotton clothes are comfortable in summer."],
+  "couch": ["সোফা", "We sat on the couch and watched TV."],
+  "could": ["পারা", "Could you please help me?"],
+  "council": ["পরিষদ", "The city council approved the new park."],
+  "counselor": ["পরামর্শদাতা", "The school counselor helps students."],
+  "count": ["গণনা করা", "Count from one to ten."],
+  "counter": ["কাউন্টার", "Place the package on the counter."],
+  "country": ["দেশ", "I love my country."],
+  "county": ["প্রশাসনিক বিভাগ", "He lives in a small county."],
+  "couple": ["দম্পতি", "A couple was walking in the park."],
+  "courage": ["সাহস", "It takes courage to speak the truth."],
+  "course": ["পাঠ্যক্রম / গতিপথ", "I am taking a course in computer science."],
+  "court": ["আদালত", "The case was presented in court."],
+  "cousin": ["চাচাত ভাই", "My cousin lives in Canada."],
+  "cover": ["আবরণ", "Put a cover on the furniture."],
+  "coverage": ["কভারেজ", "The news channel provided live coverage of the event."],
+  "cow": ["গাভী", "The cow gives milk."],
+  "crack": ["ফাটল", "There is a crack in the wall."],
+  "craft": ["শিল্প", "Traditional craft is disappearing."],
+  "crash": ["ধ্বংস", "The car crash was severe."],
+  "crazy": ["পাগল", "He is crazy about football."],
+  "cream": ["ক্রিম", "Apply sunscreen cream before going out."],
+  "create": ["সৃষ্টি করা", "Artists create beautiful paintings."],
+  "creation": ["সৃষ্টি", "The creation of the universe is a mystery."],
+  "creative": ["সৃজনশীল", "She is a very creative writer."],
+  "creature": ["প্রাণী / জীবিত সত্তা", "Every creature has a role in the ecosystem."],
+  "credit": ["কৃতিত্ব", "Give credit where it is due."],
+  "crew": ["নাবিকদল", "The crew of the ship worked hard."],
+  "crime": ["অপরাধ", "Stealing is a crime."],
+  "criminal": ["অপরাধী", "The criminal was arrested."],
+  "crisis": ["সংকট", "The country faced an economic crisis."],
+  "criteria": ["মাপকাঠি", "The criteria for selection are strict."],
+  "critic": ["সমালোচক", "The critic praised the movie."],
+  "critical": ["সমালোচনামূলক", "The patient is in critical condition."],
+  "criticism": ["সমালোচনা", "He faced criticism for his actions."],
+  "criticize": ["সমালোচনা করা", "It's easy to criticize others."],
+  "crop": ["ফসল", "The farmer harvested his crop."],
+  "cross": ["ক্রস", "The church has a cross on its roof."],
+  "crowd": ["ভিড়", "A large crowd gathered at the stadium."],
+  "crucial": ["অত্যন্ত গুরুত্বপূর্ণ", "This meeting is crucial for our project."],
+  "cry": ["কাঁদা", "The baby started to cry."],
+  "cultural": ["সাংস্কৃতিক", "Cultural diversity enriches society."],
+  "culture": ["সংস্কৃতি", "Every country has its own culture."],
+  "cup": ["কাপ", "She drank a cup of tea."],
+  "curious": ["কৌতূহলী", "Children are naturally curious."],
+  "current": ["বর্তমান", "The current situation is stable."],
+  "currently": ["বর্তমানে", "He is currently working on a new book."],
+  "curriculum": ["পাঠ্যক্রম", "The school curriculum includes science and arts."],
+  "custom": ["প্রথা", "It is a custom to exchange gifts during holidays."],
+  "customer": ["গ্রাহক", "The customer is always right."],
+  "cut": ["কাটা", "Cut the paper into two pieces."],
+  "cycle": ["চক্র", "The life cycle of a butterfly is fascinating."],
+  "dad": ["বাবা", "My dad is my hero."],
+  "daily": ["দৈনিক", "She reads the newspaper daily."],
+  "damage": ["ক্ষতি", "The storm caused a lot of damage."],
+  "dance": ["নাচ", "She loves to dance."],
+  "danger": ["বিপদ", "There is danger ahead."],
+  "dangerous": ["বিপজ্জনক", "It is dangerous to drive fast."],
+  "dare": ["সাহস করা", "How dare you speak to me like that?"],
+  "dark": ["অন্ধকার", "It gets dark early in winter."],
+  "darkness": ["অন্ধকার", "The room was in complete darkness."],
+  "data": ["উপাত্ত", "The data is stored on the computer."],
+  "date": ["তারিখ", "Today's date is 10th May."],
+  "daughter": ["কন্যা", "Their daughter is a doctor."],
+  "day": ["দিন", "There are seven days in a week."],
+  "dead": ["মৃত", "The plant is dead because we didn't water it."],
+  "deal": ["চুক্তি", "We made a deal to share the profits."],
+  "dealer": ["বিক্রেতা", "He is a car dealer."],
+  "dear": ["প্রিয়", "My dear friend, I miss you."],
+  "death": ["মৃত্যু", "His death was a great loss."],
+  "debate": ["বিতর্ক", "There was a lively debate on the topic."],
+  "debt": ["ঋণ", "He is in debt."],
+  "decade": ["দশক", "She has been teaching for over a decade."],
+  "decide": ["সিদ্ধান্ত নেওয়া", "You must decide quickly."],
+  "decision": ["সিদ্ধান্ত", "Making a decision can be difficult."],
+  "deck": ["ডেক", "We sat on the deck and enjoyed the view."],
+  "declare": ["ঘোষণা করা", "The government declared a holiday."],
+  "decline": ["প্রত্যাখ্যান", "He had to decline the invitation due to prior commitments."],
+  "decrease": ["হ্রাস", "There was a decrease in sales this month."],
+  "deep": ["গভীর", "The river is very deep here."],
+  "deeply": ["গভীরভাবে", "She was deeply moved by the story."],
+  "deer": ["হরিণ", "A deer ran across the road."],
+  "defeat": ["পরাজয়", "The team faced defeat in the final match."],
+  "defend": ["রক্ষা করা", "Soldiers defend their country."],
+  "defendant": ["প্রতিবাদী", "The defendant pleaded not guilty."],
+  "defense": ["প্রতিরক্ষা", "The defense lawyer presented her case."],
+  "defensive": ["প্রতিরক্ষামূলক", "He took a defensive stance."],
+  "deficit": ["ঘাটতি", "The company is running a deficit."],
+  "define": ["সংজ্ঞায়িত করা", "Can you define this word for me?"],
+  "definitely": ["স্পষ্টভাবে", "I will definitely come to your party."],
+  "definition": ["সংজ্ঞা", "Look up the definition of the word in the dictionary."],
+  "degree": ["ডিগ্রী", "She holds a degree in engineering."],
+  "delay": ["বিলম্ব", "The flight was delayed due to bad weather."],
+  "deliver": ["বিতরণ করা", "The postman delivers letters."],
+  "delivery": ["বিতরণ", "The delivery of the package was on time."],
+  "demand": ["চাহিদা", "There is a high demand for this product."],
+  "democracy": ["গণতন্ত্র", "India is the largest democracy in the world."],
+  "Democrat": ["ডেমোক্র্যাট", "He is a member of the Democrat party."],
+  "democratic": ["গণতান্ত্রিক", "The country has a democratic government."],
+  "demonstrate": ["প্রদর্শন করা", "The teacher demonstrated the experiment."],
+  "demonstration": ["বিক্ষোভ", "There was a demonstration against the new law."],
+  "deny": ["অস্বীকার করা", "He denied the allegations against him."],
+  "department": ["বিভাগ", "She works in the marketing department."],
+  "depend": ["নির্ভর করা", "Children depend on their parents."],
+  "dependent": ["নির্ভরশীল", "He is dependent on his family for support."],
+  "depending": ["নির্ভর করে", "We will go on a picnic depending on the weather."],
+  "depict": ["চিত্রিত করা", "The painting depicts a rural scene."],
+  "depression": ["হতাশা", "He suffered from depression after the loss."],
+  "depth": ["গভীরতা", "The depth of the ocean is mysterious."],
+  "deputy": ["সহকারী", "The deputy manager will attend the meeting."],
+  "derive": ["প্রাপ্ত হওয়া", "Many English words are derived from Latin."],
+  "describe": ["বর্ণনা করা", "Can you describe the person you saw?"],
+  "description": ["বর্ণনা", "The description of the suspect was vague."],
+  "desert": ["মরুভূমি", "The Sahara is the largest desert in the world."],
+  "deserve": ["দাবি রাখা", "You deserve a reward for your hard work."],
+  "design": ["নকশা", "The design of the building is modern."],
+  "designer": ["নকশাকার", "She is a famous fashion designer."],
+  "desire": ["ইচ্ছা", "He has a strong desire to succeed."],
+  "desk": ["ডেস্ক", "There is a computer on the desk."],
+  "desperate": ["মরিয়া", "He was desperate for a job."],
+  "despite": ["সত্ত্বেও", "Despite the rain, we went out."],
+  "destroy": ["ধ্বংস করা", "The earthquake destroyed many houses."],
+  "destruction": ["ধ্বংস", "The war caused widespread destruction."],
+  "detail": ["বিস্তারিত", "Please provide all the details."],
+  "detailed": ["বিস্তারিত", "He gave a detailed explanation."],
+  "detect": ["সনাক্ত করা", "The test can detect the virus early."],
+  "determine": ["নির্ণয় করা", "We need to determine the cause of the problem."],
+  "develop": ["উন্নয়ন করা", "The company plans to develop new software."],
+  "developing": ["উন্নয়নশীল", "Many developing countries face economic challenges."],
+  "development": ["উন্নয়ন", "The development of technology has changed our lives."],
+  "device": ["যন্ত্র", "This device measures blood pressure."],
+  "devote": ["উত্সর্গ করা", "She devotes her time to charity work."],
+  "dialogue": ["সংলাপ", "The dialogue between the two leaders was productive."],
+  "die": ["মরা", "All living beings die one day."],
+  "diet": ["খাদ্যাভ্যাস", "A balanced diet is important for good health."],
+  "differ": ["ভিন্ন হত্তয়া", "Our opinions differ on this matter."],
+  "difference": ["পার্থক্য", "There is a big difference between these two products."],
+  "different": ["ভিন্ন", "People have different tastes in music."],
+  "differently": ["ভিন্নভাবে", "He thinks differently from others."],
+  "difficult": ["কঠিন", "The exam was very difficult."],
+  "difficulty": ["কঠিনতা", "She faced many difficulties in her life."],
+  "dig": ["খনন করা", "We need to dig a hole to plant the tree."],
+  "digital": ["ডিজিটাল", "We live in the digital age."],
+  "dimension": ["মাত্রা", "The dimension of the room is 20 feet by 15 feet."],
+  "dining": ["ভোজন", "The dining table is set for six people."],
+  "dinner": ["রাতের খাবার", "We have dinner at 8 PM."],
+  "direct": ["সরাসরি", "This is a direct flight to London."],
+  "direction": ["দিক", "He went in the wrong direction."],
+  "directly": ["সরাসরি", "She directly addressed the issue."],
+  "director": ["পরিচালক", "The director of the company called a meeting."],
+  "dirt": ["ময়লা", "Wash the dirt off your hands."],
+  "dirty": ["নোংরা", "The room was dirty and untidy."],
+  "disability": ["অক্ষমতা", "People with disability should be treated with respect."],
+  "disagree": ["অসম্মত হত্তয়া", "I disagree with your opinion."],
+  "disappear": ["অদৃশ্য হওয়া", "The sun disappears behind the clouds."],
+  "disaster": ["দুর্যোগ", "The flood was a natural disaster."],
+  "discipline": ["শৃঙ্খলা", "Discipline is important for success."],
+  "discourse": ["বক্তৃতা", "The discourse on human rights was enlightening."],
+  "discover": ["আবিষ্কার করা", "Scientists discover new things every day."],
+  "discovery": ["আবিষ্কার", "The discovery of penicillin was a breakthrough."],
+  "discrimination": ["বৈষম্য", "Discrimination based on race is unacceptable."],
+  "discuss": ["আলোচনা করা", "Let's discuss the plan in detail."],
+  "discussion": ["আলোচনা", "The discussion went on for hours."],
+  "disease": ["রোগ", "Malaria is a dangerous disease."],
+  "dish": ["থালা", "She cooked a delicious dish."],
+  "dismiss": ["খারিজ করা", "The judge decided to dismiss the case."],
+  "disorder": ["ব্যাধি", "He suffers from a sleep disorder."],
+  "display": ["প্রদর্শন", "The museum has a display of ancient artifacts."],
+  "dispute": ["বিতর্ক", "The dispute between the neighbors was settled."],
+  "distance": ["দূরত্ব", "The distance from my home to office is 10 kilometers."],
+  "distant": ["দূরবর্তী", "He comes from a distant village."],
+  "distinct": ["স্পষ্ট", "There is a distinct difference between the two."],
+  "distinction": ["পার্থক্য", "She passed with distinction."],
+  "distinguish": ["প্রভেদ করা", "It is difficult to distinguish between the twins."],
+  "distribute": ["বিতরণ করা", "They distribute food to the poor."],
+  "distribution": ["বিতরণ", "The distribution of resources should be fair."],
+  "district": ["জেলা", "This district is known for its handicrafts."],
+  "diverse": ["বিবিধ", "The group has diverse opinions."],
+  "diversity": ["বৈচিত্র্য", "Cultural diversity is a strength."],
+  "divide": ["বিভক্ত করা", "Divide the cake into eight equal pieces."],
+  "division": ["বিভাগ", "The company has several divisions."],
+  "divorce": ["তালাক", "Their divorce was finalized last month."],
+  "DNA": ["ডিএনএ", "DNA testing can determine paternity."],
+  "do": ["করা", "What will you do tomorrow?"],
+  "doctor": ["ডাক্তার", "The doctor advised me to rest."],
+  "document": ["দলিল", "Please sign this document."],
+  "dog": ["কুকুর", "The dog is barking loudly."],
+  "domestic": ["গার্হস্থ্য", "Domestic violence is a serious issue."],
+  "dominant": ["প্রভাবশালী", "The dominant team won the match."],
+  "dominate": ["আধিপত্য করা", "The company dominates the market."],
+  "door": ["দরজা", "Please close the door."],
+  "double": ["দ্বিগুণ", "The recipe requires double the amount of sugar."],
+  "doubt": ["সন্দেহ", "I have no doubt about his honesty."],
+  "down": ["নিচে", "Sit down on the chair."],
+  "downtown": ["শহরের কেন্দ্র", "We went shopping in downtown."],
+  "dozen": ["ডজন", "I bought a dozen eggs."],
+  "draft": ["খসড়া", "He wrote the first draft of his novel."],
+  "drag": ["টানা", "Don't drag the chair, lift it."],
+  "drama": ["নাটক", "We are watching a historical drama."],
+  "dramatic": ["নাটকীয়", "There was a dramatic change in the weather."],
+  "dramatically": ["নাটকীয়ভাবে", "The situation improved dramatically."],
+  "draw": ["আঁকা", "Children love to draw pictures."],
+  "drawing": ["অঙ্কন", "Her drawing of the landscape was beautiful."],
+  "dream": ["স্বপ্ন", "I had a strange dream last night."],
+  "dress": ["পোশাক", "She wore a beautiful dress to the party."],
+  "drink": ["পান করা", "It is important to drink enough water."],
+  "drive": ["চালনা করা", "He learned to drive when he was eighteen."],
+  "driver": ["চালক", "The bus driver was very friendly."],
+  "drop": ["পড়া", "Be careful not to drop the glass."],
+  "drug": ["ঔষধ", "This drug is effective against the disease."],
+  "dry": ["শুষ্ক", "The clothes are dry now."],
+  "due": ["দেওয়া", "The assignment is due next Monday."],
+  "during": ["সময়ে", "During the summer, we go swimming."],
+  "dust": ["ধুলো", "The furniture was covered with dust."],
+  "duty": ["কর্তব্য", "It is our duty to help others."],
+  "egg": ["ডিম", "I eat an egg every morning."],
+  "eight": ["আট", "There are eight planets in our solar system."],
+  "either": ["হয়", "You can choose either tea or coffee."],
+  "elderly": ["বৃদ্ধ", "We should respect elderly people."],
+  "elect": ["নির্বাচিত করা", "The people will elect a new president."],
+  "election": ["নির্বাচন", "The election will be held next month."],
+  "electric": ["বৈদ্যুতিক", "We use electric appliances at home."],
+  "electricity": ["বিদ্যুৎ", "Electricity powers our homes."],
+  "electronic": ["ইলেকট্রনিক", "Electronic devices are common nowadays."],
+  "element": ["উপাদান", "Water is composed of hydrogen and oxygen elements."],
+  "elementary": ["প্রাথমিক", "She teaches at an elementary school."],
+  "eliminate": ["দূর করা", "We must eliminate poverty."],
+  "elite": ["অভিজাত", "The elite class has certain privileges."],
+  "else": ["অন্য", "What else do you need?"],
+  "elsewhere": ["অন্যত্র", "He decided to look for a job elsewhere."],
+  "e-mail": ["ই-মেইল", "Send me an e-mail with the details."],
+  "embrace": ["আলিঙ্গন করা", "They embraced each other warmly."],
+  "emerge": ["উত্থিত হওয়া", "The sun emerged from behind the clouds."],
+  "emergency": ["জরুরী", "Call this number in case of an emergency."],
+  "emission": ["নিঃসরণ", "Car emission contributes to air pollution."],
+  "emotion": ["ভাবাবেগ", "Love is a powerful emotion."],
+  "emotional": ["আবেগপ্রবণ", "She became emotional during the speech."],
+  "emphasis": ["জোর", "The school puts emphasis on discipline."],
+  "emphasize": ["গুরুত্ব দেওয়া", "I want to emphasize the importance of education."],
+  "employ": ["নিয়োগ করা", "The company will employ new staff."],
+  "employee": ["কর্মচারী", "The employee works hard."],
+  "employer": ["নিয়োগকর্তা", "The employer pays the salaries."],
+  "employment": ["চাকরি", "He is seeking employment."],
+  "empty": ["খালি", "The bottle is empty."],
+  "enable": ["সক্ষম করা", "This software will enable you to edit videos."],
+  "encounter": ["সম্মুখীন হওয়া", "We may encounter difficulties on the way."],
+  "encourage": ["উত্সাহিত করা", "Parents should encourage their children."],
+  "end": ["শেষ", "This is the end of the road."],
+  "enemy": ["শত্রু", "They defeated the enemy."],
+  "energy": ["শক্তি", "Solar energy is renewable."],
+  "enforcement": ["প্রয়োগ", "The enforcement of the law is necessary."],
+  "engage": ["নিযুক্ত করা", "He tried to engage her in conversation."],
+  "engine": ["ইঞ্জিন", "The engine of the car is powerful."],
+  "engineer": ["প্রকৌশলী", "My brother is a software engineer."],
+  "engineering": ["প্রকৌশল", "He studies civil engineering."],
+  "English": ["ইংরেজি", "English is an international language."],
+  "enhance": ["বাড়ানো", "Exercise can enhance your health."],
+  "enjoy": ["উপভোগ করা", "I enjoy reading books."],
+  "enormous": ["বিপুল", "An elephant is an enormous animal."],
+  "enough": ["যথেষ্ট", "We have enough food for everyone."],
+  "ensure": ["নিশ্চিত করা", "Ensure that the door is locked."],
+  "enter": ["প্রবেশ করা", "Please enter the room quietly."],
+  "enterprise": ["উদ্যোগ", "He started a new enterprise."],
+  "entertainment": ["বিনোদন", "Movies are a popular form of entertainment."],
+  "entire": ["সমগ্র", "The entire village was affected."],
+  "entirely": ["সম্পূর্ণরূপে", "I entirely agree with you."],
+  "entrance": ["প্রবেশপথ", "The entrance to the building is on the left."],
+  "entry": ["প্রবেশ", "No entry without permission."],
+  "environment": ["পরিবেশ", "We should protect the environment."],
+  "environmental": ["পরিবেশগত", "Environmental issues are important."],
+  "episode": ["পর্ব", "I watched the latest episode of the series."],
+  "equal": ["সমান", "All men are created equal."],
+  "equally": ["সমানভাবে", "Divide the cake equally among the children."],
+  "equipment": ["সরঞ্জাম", "The laboratory has modern equipment."],
+  "era": ["যুগ", "We live in the digital era."],
+  "error": ["ত্রুটি", "There is an error in the calculation."],
+  "escape": ["পলায়ন", "The prisoner tried to escape."],
+  "especially": ["বিশেষ করে", "I love fruits, especially mangoes."],
+  "essay": ["প্রবন্ধ", "She wrote an essay on education."],
+  "essential": ["অপরিহার্য", "Water is essential for life."],
+  "essentially": ["মূলত", "The plan is essentially the same."],
+  "establish": ["স্থাপন করা", "They established a new company."],
+  "establishment": ["প্রতিষ্ঠান", "The establishment of the school was in 1990."],
+  "estate": ["জমি", "He owns a large estate in the countryside."],
+  "estimate": ["আনুমানিক হিসাব", "The estimate for the repair is $500."],
+  "etc": ["ইত্যাদি", "We need to buy vegetables, fruits, etc."],
+  "ethics": ["নৈতিকতা", "Medical ethics are important for doctors."],
+  "ethnic": ["জাতিগত", "The country has many ethnic groups."],
+  "European": ["ইউরোপীয়", "European countries have rich cultures."],
+  "evaluate": ["মূল্যায়ন করা", "Teachers evaluate students' performance."],
+  "evaluation": ["মূল্যায়ন", "The evaluation of the project was positive."],
+  "even": ["এমনকি", "Even a child can understand this."],
+  "evening": ["সন্ধ্যা", "We go for a walk in the evening."],
+  "event": ["ঘটনা", "The sports event was exciting."],
+  "eventually": ["অবশেষে", "Eventually, he found his lost keys."],
+  "ever": ["কখনও", "Have you ever been to London?"],
+  "every": ["প্রতি", "Every student must attend."],
+  "everybody": ["সবাই", "Everybody is welcome."],
+  "everyday": ["প্রতিদিন", "These are everyday problems."],
+  "everyone": ["সকলেই", "Everyone enjoyed the party."],
+  "everything": ["সবকিছু", "Everything is ready for the trip."],
+  "everywhere": ["সর্বত্র", "There were flowers everywhere."],
+  "evidence": ["প্রমাণ", "The evidence was presented in court."],
+  "evolution": ["বিবর্তন", "Darwin's theory of evolution is famous."],
+  "evolve": ["বিবর্তিত হওয়া", "Languages evolve over time."],
+  "exact": ["সঠিক", "What is the exact time?"],
+  "exactly": ["ঠিক", "That's exactly what I meant."],
+  "examination": ["পরীক্ষা", "The medical examination was thorough."],
+  "examine": ["পরীক্ষা করা", "The doctor will examine the patient."],
+  "example": ["উদাহরণ", "For example, consider this case."],
+  "exceed": ["অতিক্রম করা", "Do not exceed the speed limit."],
+  "excellent": ["চমৎকার", "She is an excellent student."],
+  "except": ["ছাড়া", "Everyone except John was present."],
+  "exception": ["ব্যতিক্রম", "There is an exception to every rule."],
+  "exchange": ["বিনিময়", "We exchange gifts during festivals."],
+  "exciting": ["উত্তেজনাপূর্ণ", "The movie was exciting."],
+  "executive": ["কার্যনির্বাহী", "He is an executive in a multinational company."],
+  "exercise": ["ব্যায়াম", "Regular exercise is good for health."],
+  "exhibit": ["প্রদর্শন করা", "The museum will exhibit ancient coins."],
+  "exhibition": ["প্রদর্শনী", "We visited an art exhibition."],
+  "exist": ["বিদ্যমান থাকা", "Do ghosts really exist?"],
+  "existence": ["অস্তিত্ব", "The existence of life on other planets is possible."],
+  "existing": ["বিদ্যমান", "We need to improve existing systems."],
+  "expand": ["প্রসারিত করা", "The company plans to expand its business."],
+  "expansion": ["প্রসারণ", "The expansion of the factory created new jobs."],
+  "expect": ["আশা করা", "I expect you to be on time."],
+  "expectation": ["প্রত্যাশা", "The product did not meet our expectations."],
+  "expense": ["খরচ", "The expense of the trip was high."],
+  "expensive": ["দামী", "This car is very expensive."],
+  "experience": ["অভিজ্ঞতা", "She has ten years of teaching experience."],
+  "experiment": ["পরীক্ষা", "The scientist conducted an experiment."],
+  "expert": ["বিশেষজ্ঞ", "He is an expert in this field."],
+  "explain": ["ব্যাখ্যা করা", "Can you explain this to me?"],
+  "explanation": ["ব্যাখ্যা", "His explanation was clear."],
+  "explode": ["বিস্ফোরণ করা", "The bomb may explode at any time."],
+  "explore": ["অন্বেষণ করা", "We want to explore new places."],
+  "explosion": ["বিস্ফোরণ", "The explosion was heard miles away."],
+  "expose": ["উন্মোচিত করা", "Do not expose the film to light."],
+  "exposure": ["সম্পর্ক", "Exposure to sunlight is good for health."],
+  "express": ["প্রকাশ করা", "She expressed her gratitude."],
+  "expression": ["অভিব্যক্তি", "Facial expressions can convey emotions."],
+  "extend": ["বাড়ানো", "We will extend the deadline."],
+  "extension": ["সম্প্রসারণ", "He asked for an extension of time."],
+  "extensive": ["ব্যাপক", "She has extensive knowledge of history."],
+  "extent": ["সীমা", "To what extent are you involved?"],
+  "external": ["বাহ্যিক", "External factors can influence the outcome."],
+  "extra": ["অতিরিক্ত", "We need extra time to finish."],
+  "extraordinary": ["অসাধারণ", "She has extraordinary talent."],
+  "extreme": ["চরম", "He took extreme measures."],
+  "extremely": ["অত্যন্ত", "The weather is extremely hot."],
+  "eye": ["চোখ", "We see with our eyes."]
+
+
+};
+
+
+        let allWords = [];
+        let filteredWords = [];
+        let currentFilter = '';
+        let blurredBangla = new Set();
+        let blurredEnglish = new Set();
+        let markedWords = new Map();
+        let showingMarked = false;
+        let currentLevelFilter = 'all';
+
+        function init() {
+            loadVocabData();
+            loadMarkedWords();
+            createAlphabetFilter();
+            loadLastPosition();
+            displayWords(filteredWords);
+            updateStats();
+            
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', handleSearch);
+            }
+            
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.mark-btn')) {
+                    document.querySelectorAll('.mark-dropdown').forEach(d => d.classList.remove('show'));
+                }
+            });
+        }
+
+        function loadVocabData() {
+            for (let [word, data] of Object.entries(vocabData)) {
+                allWords.push({
+                    english: word,
+                    bangla: data[0],
+                    sentence: data[1]
+                });
+            }
+            filteredWords = [...allWords];
+        }
+
+        function createAlphabetFilter() {
+            const container = document.getElementById('alphabetFilter');
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+            
+            alphabet.forEach(letter => {
+                const btn = document.createElement('button');
+                btn.className = 'letter-btn';
+                btn.textContent = letter;
+                btn.onclick = () => filterByLetter(letter);
+                container.appendChild(btn);
+            });
+        }
+
+        function filterByLetter(letter) {
+            const buttons = document.querySelectorAll('.letter-btn');
+            buttons.forEach(btn => {
+                if (btn.textContent === letter) {
+                    if (btn.classList.contains('active')) {
+                        btn.classList.remove('active');
+                        currentFilter = '';
+                        filteredWords = [...allWords];
+                    } else {
+                        buttons.forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        currentFilter = letter.toLowerCase();
+                        filteredWords = allWords.filter(w => 
+                            w.english.toLowerCase().startsWith(currentFilter)
+                        );
+                        localStorage.setItem('lastLetter', letter);
+                    }
+                }
+            });
+            showingMarked = false;
+            displayWords(filteredWords);
+            updateStats();
+        }
+
+        function handleSearch(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            let wordsToFilter = currentFilter 
+                ? allWords.filter(w => w.english.toLowerCase().startsWith(currentFilter))
+                : allWords;
+            
+            filteredWords = wordsToFilter.filter(w => 
+                w.english.toLowerCase().includes(searchTerm) ||
+                w.bangla.includes(searchTerm)
+            );
+            displayWords(filteredWords);
+            updateStats();
+        }
+
+        function displayWords(words) {
+            const container = document.getElementById('vocabList');
+            container.innerHTML = '';
+            
+            // Add level filter dropdown when showing marked words
+            if (showingMarked) {
+                const filterDiv = document.createElement('div');
+                filterDiv.style.cssText = 'background:#f8f9fa;padding:15px;margin-bottom:15px;border-radius:10px;border:2px solid #667eea;';
+                filterDiv.innerHTML = `
+                    <label style="font-weight:bold;margin-right:10px;color:#667eea;">📌 Filter by Level:</label>
+                    <select id="markedLevelFilter" style="padding:8px 15px;border:2px solid #667eea;border-radius:8px;font-size:14px;cursor:pointer;background:white;">
+                        <option value="all">📚 All Levels</option>
+                        <option value="5">★★★★★ Level 5 (খুবই কঠিন)</option>
+                        <option value="4">★★★★ Level 4 (কঠিন)</option>
+                        <option value="3">★★★ Level 3 (মাঝারি)</option>
+                        <option value="2">★★ Level 2 (সহজ)</option>
+                        <option value="1">★ Level 1 (খুব সহজ)</option>
+                    </select>
+                `;
+                container.appendChild(filterDiv);
+                
+                const select = filterDiv.querySelector('#markedLevelFilter');
+                select.value = currentLevelFilter;
+                select.onchange = function() {
+                    filterMarkedByLevel(this.value);
+                };
+            }
+            
+            if (words.length === 0) {
+                const noResult = document.createElement('div');
+                noResult.style.cssText = 'text-align:center;padding:40px;color:#6c757d;';
+                noResult.textContent = 'কোনো শব্দ পাওয়া যায়নি';
+                container.appendChild(noResult);
+                return;
+            }
+
+            words.forEach((word, index) => {
+                const item = document.createElement('div');
+                item.className = 'vocab-item';
+                item.dataset.index = index;
+                item.dataset.word = word.english;
+
+                const markLevel = markedWords.get(word.english);
+                if (markLevel) {
+                    item.classList.add(`marked-${markLevel}`);
+                }
+
+                const banglaClass = blurredBangla.has(word.english) ? 'bangla-blur' : '';
+                const englishClass = blurredEnglish.has(word.english) ? 'english-blur' : '';
+                
+                const markBtnClass = markLevel ? `marked-${markLevel}` : '';
+                const markBtnText = markLevel ? `★ Level ${markLevel}` : '☆ Mark';
+
+                item.innerHTML = `
+                    <div class="vocab-header">
+                        <p id="index">${index + 1}</p>
+                        <button class="blur-toggle" data-word="${word.english}" data-type="bangla">
+                            ${blurredBangla.has(word.english) ? '🇧🇩 Unblur' : '🇧🇩 Blur'}
+                        </button>
+                        <button class="blur-toggle" data-word="${word.english}" data-type="english">
+                            ${blurredEnglish.has(word.english) ? '🇬🇧 Unblur' : '🇬🇧 Blur'}
+                        </button>
+                        <button class="mark-btn ${markBtnClass}" data-word="${word.english}">
+                            ${markBtnText}
+                            <div class="mark-dropdown">
+                                <div class="mark-option level-5" data-level="5">★★★★★ খুবই কঠিন</div>
+                                <div class="mark-option level-4" data-level="4">★★★★ কঠিন</div>
+                                <div class="mark-option level-3" data-level="3">★★★ মাঝারি</div>
+                                <div class="mark-option level-2" data-level="2">★★ সহজ</div>
+                                <div class="mark-option level-1" data-level="1">★ খুব সহজ</div>
+                                <div class="mark-option" data-level="0" style="color:#dc3545;">✕ Remove Mark</div>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="content">
+                        <div class="word-bangla ${banglaClass}">${word.bangla}</div>
+                        <div class="word-english ${englishClass}">
+                            ${word.english}
+                            <span class="speaker-icon" data-word="${word.english}">🔊</span>
+                        </div>
+                        <div class="sentence">${word.sentence}</div>
+                    </div>
+                `;
+
+                // Blur toggle handlers
+                item.querySelectorAll('.blur-toggle').forEach(btn => {
+                    btn.onclick = function(e) {
+                        e.stopPropagation();
+                        const word = this.dataset.word;
+                        const type = this.dataset.type;
+                        toggleBlur(word, type, this);
+                    };
+                });
+
+                // Speaker handler
+                const speaker = item.querySelector('.speaker-icon');
+                speaker.onclick = function(e) {
+                    e.stopPropagation();
+                    speak(this.dataset.word);
+                };
+
+                // Mark button handler
+                const markBtn = item.querySelector('.mark-btn');
+                markBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    toggleMarkDropdown(this);
+                };
+
+                // Mark options handlers
+                item.querySelectorAll('.mark-option').forEach(opt => {
+                    opt.onclick = function(e) {
+                        e.stopPropagation();
+                        const level = parseInt(this.dataset.level);
+                        setMarkLevel(word.english, level);
+                    };
+                });
+
+                item.addEventListener('click', (e) => {
+                    if (!e.target.closest('.blur-toggle') && 
+                        !e.target.closest('.speaker-icon') &&
+                        !e.target.closest('.mark-btn')) {
+                        saveLastPosition(index, word.english);
+                    }
+                });
+
+                container.appendChild(item);
+            });
+        }
+
+        function speak(word) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(word);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.8;
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        function toggleBlur(word, type, button) {
+            const item = button.closest('.vocab-item');
+            const targetElement = item.querySelector(type === 'bangla' ? '.word-bangla' : '.word-english');
+            const targetSet = type === 'bangla' ? blurredBangla : blurredEnglish;
+            const blurClass = type === 'bangla' ? 'bangla-blur' : 'english-blur';
+            
+            if (targetSet.has(word)) {
+                targetSet.delete(word);
+                targetElement.classList.remove(blurClass);
+                button.textContent = type === 'bangla' ? '🇧🇩 Blur' : '🇬🇧 Blur';
+            } else {
+                targetSet.add(word);
+                targetElement.classList.add(blurClass);
+                button.textContent = type === 'bangla' ? '🇧🇩 Unblur' : '🇬🇧 Unblur';
+            }
+        }
+
+        function toggleMarkDropdown(button) {
+            const dropdown = button.querySelector('.mark-dropdown');
+            const allDropdowns = document.querySelectorAll('.mark-dropdown');
+            
+            allDropdowns.forEach(d => {
+                if (d !== dropdown) d.classList.remove('show');
+            });
+            
+            dropdown.classList.toggle('show');
+        }
+
+        function setMarkLevel(word, level) {
+            const item = document.querySelector(`[data-word="${word}"]`);
+            if (!item) return;
+            
+            const button = item.querySelector('.mark-btn');
+            
+            for (let i = 1; i <= 5; i++) {
+                item.classList.remove(`marked-${i}`);
+                button.classList.remove(`marked-${i}`);
+            }
+            
+            if (level === 0) {
+                markedWords.delete(word);
+                button.innerHTML = `☆ Mark<div class="mark-dropdown">
+                    <div class="mark-option level-5" data-level="5">★★★★★ খুবই কঠিন</div>
+                    <div class="mark-option level-4" data-level="4">★★★★ কঠিন</div>
+                    <div class="mark-option level-3" data-level="3">★★★ মাঝারি</div>
+                    <div class="mark-option level-2" data-level="2">★★ সহজ</div>
+                    <div class="mark-option level-1" data-level="1">★ খুব সহজ</div>
+                    <div class="mark-option" data-level="0" style="color:#dc3545;">✕ Remove Mark</div>
+                </div>`;
+            } else {
+                markedWords.set(word, level);
+                item.classList.add(`marked-${level}`);
+                button.classList.add(`marked-${level}`);
+                button.innerHTML = `★ Level ${level}<div class="mark-dropdown">
+                    <div class="mark-option level-5" data-level="5">★★★★★ খুবই কঠিন</div>
+                    <div class="mark-option level-4" data-level="4">★★★★ কঠিন</div>
+                    <div class="mark-option level-3" data-level="3">★★★ মাঝারি</div>
+                    <div class="mark-option level-2" data-level="2">★★ সহজ</div>
+                    <div class="mark-option level-1" data-level="1">★ খুব সহজ</div>
+                    <div class="mark-option" data-level="0" style="color:#dc3545;">✕ Remove Mark</div>
+                </div>`;
+            }
+            
+            const dropdown = button.querySelector('.mark-dropdown');
+            dropdown.querySelectorAll('.mark-option').forEach(opt => {
+                opt.onclick = function(e) {
+                    e.stopPropagation();
+                    const lv = parseInt(this.dataset.level);
+                    setMarkLevel(word, lv);
+                };
+            });
+            
+            dropdown.classList.remove('show');
+            saveMarkedWords();
+            updateStats();
+        }
+
+        function toggleAllBlur(type) {
+            const targetSet = type === 'bangla' ? blurredBangla : blurredEnglish;
+            const allBlurred = filteredWords.every(w => targetSet.has(w.english));
+
+            if (allBlurred) {
+                targetSet.clear();
+            } else {
+                filteredWords.forEach(w => targetSet.add(w.english));
+            }
+            displayWords(filteredWords);
+        }
+
+        function showMarkedWords() {
+            if (showingMarked) {
+                showingMarked = false;
+                currentLevelFilter = 'all';
+                filteredWords = currentFilter 
+                    ? allWords.filter(w => w.english.toLowerCase().startsWith(currentFilter))
+                    : [...allWords];
+            } else {
+                showingMarked = true;
+                currentLevelFilter = 'all';
+                filteredWords = allWords.filter(w => markedWords.has(w.english));
+            }
+            displayWords(filteredWords);
+            updateStats();
+        }
+
+        function filterMarkedByLevel(level) {
+            if (level === 'all') {
+                currentLevelFilter = 'all';
+                filteredWords = allWords.filter(w => markedWords.has(w.english));
+            } else {
+                currentLevelFilter = parseInt(level);
+                filteredWords = allWords.filter(w => markedWords.get(w.english) === currentLevelFilter);
+            }
+            
+            displayWords(filteredWords);
+            updateStats();
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.querySelectorAll('.letter-btn').forEach(btn => btn.classList.remove('active'));
+            currentFilter = '';
+            currentLevelFilter = 'all';
+            filteredWords = [...allWords];
+            showingMarked = false;
+            displayWords(filteredWords);
+            updateStats();
+        }
+
+        function saveMarkedWords() {
+            const markedArray = Array.from(markedWords.entries());
+            localStorage.setItem('markedWords', JSON.stringify(markedArray));
+        }
+
+        function loadMarkedWords() {
+            const saved = localStorage.getItem('markedWords');
+            if (saved) {
+                const markedArray = JSON.parse(saved);
+                markedWords = new Map(markedArray);
+            }
+        }
+
+        function updateStats() {
+            const stats = document.getElementById('stats');
+            const markedCount = markedWords.size;
+            let showingText = '';
+            
+            if (showingMarked) {
+                if (currentLevelFilter !== 'all') {
+                    showingText = ` | Level ${currentLevelFilter} Marked Words দেখাচ্ছে`;
+                } else {
+                    showingText = ' | All Marked Words দেখাচ্ছে';
+                }
+            }
+            
+            stats.textContent = `মোট ${allWords.length} টি শব্দ | দেখানো হচ্ছে: ${filteredWords.length} টি | Marked: ${markedCount}${showingText}`;
+        }
+
+        function saveLastPosition(index, word) {
+            const letter = word.charAt(0).toUpperCase();
+            localStorage.setItem('lastPosition', JSON.stringify({
+                index: index,
+                word: word,
+                letter: letter
+            }));
+        }
+
+        function loadLastPosition() {
+            const saved = localStorage.getItem('lastPosition');
+            const lastLetter = localStorage.getItem('lastLetter');
+            
+            if (lastLetter) {
+                const letterBtn = Array.from(document.querySelectorAll('.letter-btn'))
+                    .find(btn => btn.textContent === lastLetter);
+                if (letterBtn) {
+                    setTimeout(() => {
+                        letterBtn.click();
+                        
+                        if (saved) {
+                            const data = JSON.parse(saved);
+                            setTimeout(() => {
+                                const item = document.querySelector(`[data-word="${data.word}"]`);
+                                if (item) {
+                                    item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    item.style.borderColor = '#667eea';
+                                    item.style.borderWidth = '3px';
+                                }
+                            }, 500);
+                        }
+                    }, 100);
+                }
+            } else if (saved) {
+                const data = JSON.parse(saved);
+                setTimeout(() => {
+                    const item = document.querySelector(`[data-word="${data.word}"]`);
+                    if (item) {
+                        item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        item.style.borderColor = '#667eea';
+                        item.style.borderWidth = '3px';
+                    }
+                }, 800);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
